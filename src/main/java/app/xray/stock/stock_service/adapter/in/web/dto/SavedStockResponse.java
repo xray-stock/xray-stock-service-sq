@@ -14,17 +14,19 @@ import java.time.Instant;
 @AllArgsConstructor
 public class SavedStockResponse {
 
+    private String id;
     private String marketType;
     private String symbol;
     private String name;
     private Instant createdAt;
 
-    public static SavedStockResponse from(Stock registered) {
+    public static SavedStockResponse from(Stock saved) {
         SavedStockResponse response = new SavedStockResponse();
-        response.marketType = registered.getMarketType().name();
-        response.symbol = registered.getSymbol();
-        response.name = registered.getName();
-        response.createdAt = registered.getCreateAt();
+        response.id = saved.getId();
+        response.marketType = saved.getMarketType().name();
+        response.symbol = saved.getSymbol();
+        response.name = saved.getName();
+        response.createdAt = saved.getCreateAt();
         return response;
     }
 }
