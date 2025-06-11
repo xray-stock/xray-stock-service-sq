@@ -31,17 +31,17 @@ public class StockCommandController {
         return ResponseEntity.ok(SavedStockResponse.from(registered));
     }
 
-    @PatchMapping("/{stockId}/start")
-    public ResponseEntity<HttpStatus> start(@PathVariable("stockId") String stockId) {
+    @PostMapping("/{stockId}/collecting")
+    public ResponseEntity<Void> startCollecting(@PathVariable("stockId") String stockId) {
         StartCollectingStockCommand command = StartCollectingStockCommand.from(stockId);
-        startCollectingStockUseCase.start(command);
+        startCollectingStockUseCase.startCollecting(command);
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/{stockId}/end")
-    public ResponseEntity<HttpStatus> end(@PathVariable("stockId") String stockId) {
+    @DeleteMapping("/{stockId}/collecting")
+    public ResponseEntity<Void> stopCollecting(@PathVariable("stockId") String stockId) {
         StopCollectingStockCommand command = StopCollectingStockCommand.from(stockId);
-        stopCollectingStockUseCase.stop(command);
+        stopCollectingStockUseCase.stopCollecting(command);
         return ResponseEntity.ok().build();
     }
 

@@ -4,5 +4,5 @@ import app.xray.stock.stock_service.application.port.vo.StartCollectingStockComm
 
 public interface StartCollectingStockUseCase {
 
-    void start(StartCollectingStockCommand command);
+    void startCollecting(StartCollectingStockCommand command);
 }

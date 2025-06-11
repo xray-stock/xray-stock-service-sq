@@ -5,6 +5,7 @@ import app.xray.stock.stock_service.application.port.in.StartCollectingStockUseC
 import app.xray.stock.stock_service.application.port.in.StopCollectingStockUseCase;
 import app.xray.stock.stock_service.application.port.out.LoadStockDataPort;
 import app.xray.stock.stock_service.application.port.out.SaveStockDataPort;
+import app.xray.stock.stock_service.application.port.out.StockGeneratorClient;
 import app.xray.stock.stock_service.application.port.vo.SaveStockCommand;
 import app.xray.stock.stock_service.application.port.vo.StartCollectingStockCommand;
 import app.xray.stock.stock_service.application.port.vo.StopCollectingStockCommand;
@@ -21,21 +22,23 @@ public class StockCommandService implements SaveStockUseCase, StartCollectingSto
     private final SaveStockDataPort saveStockDataPort;
     private final LoadStockDataPort loadStockDataPort;
 
+    private final StockGeneratorClient stockGeneratorClient;
+
     @Override
     public Stock save(SaveStockCommand command) {
         return saveStockDataPort.save(Stock.create(command.getMarketType(), command.getSymbol(), command.getName()));
     }
 
     @Override
-    public void start(StartCollectingStockCommand command) {
+    public void startCollecting(StartCollectingStockCommand command) {
         Stock stock = loadStockDataPort.findOneById(command.getStockId()).orElseThrow(); // FIXME custom exception
-        // TODO 수집가능한지 판단
+        stock.enable(stockGeneratorClient.checkStockTick(stock.getSymbol()));
         stock.start();
         saveStockDataPort.save(stock);
     }
 
     @Override
-    public void stop(StopCollectingStockCommand command) {
+    public void stopCollecting(StopCollectingStockCommand command) {
         Stock stock = loadStockDataPort.findOneById(command.getStockId()).orElseThrow(); // FIXME custom exception
         stock.stop();
         saveStockDataPort.save(stock);

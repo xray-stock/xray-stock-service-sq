@@ -56,6 +56,7 @@ public class Stock extends SelfValidating<Stock> {
             throw new IllegalStateException(); // FIXME custom exception
         }
         startedAt = Instant.now();
+        endedAt = null;
     }
 
     public void stop() {
@@ -63,6 +64,10 @@ public class Stock extends SelfValidating<Stock> {
             throw new IllegalStateException(); // FIXME custom exception
         }
         endedAt = Instant.now();
+    }
+
+    public void enable(boolean enable) {
+        this.enable = enable;
     }
 
     /**

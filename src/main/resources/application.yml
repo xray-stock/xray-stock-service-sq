@@ -9,3 +9,10 @@ spring:
       database: xray-stock
       username: ${MONGO_USER}
       password: ${MONGO_PASS}
+
+server:
+  port: 8081
+
+endpoint:
+  stock-generator:
+    base-url: http://localhost:8080/api/v1

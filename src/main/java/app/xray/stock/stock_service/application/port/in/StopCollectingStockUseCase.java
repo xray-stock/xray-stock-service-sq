@@ -4,5 +4,5 @@ import app.xray.stock.stock_service.application.port.vo.StopCollectingStockComma
 
 public interface StopCollectingStockUseCase {
 
-    void stop(StopCollectingStockCommand command);
+    void stopCollecting(StopCollectingStockCommand command);
 }
