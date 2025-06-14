@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface LoadCollectEnableStocksUseCase {
 
-    List<Stock> load();
+    List<Stock> loadAll();
 }

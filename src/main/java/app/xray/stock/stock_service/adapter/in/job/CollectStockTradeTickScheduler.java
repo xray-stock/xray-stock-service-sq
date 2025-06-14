@@ -17,12 +17,14 @@ import java.util.List;
 public class CollectStockTradeTickScheduler {
 
     private final LoadCollectEnableStocksUseCase loadCollectEnableStocksUseCase;
-    private final CollectTradeTickDataUseCase collectTradeTickDataUseCase;
+//    private final CollectTradeTickDataUseCase collectTradeTickDataUseCase;
 
     @Scheduled(fixedRate = 5000)
     public void collect() {
-        List<Stock> stocks = loadCollectEnableStocksUseCase.load();
-        collectTradeTickDataUseCase.collectAndSave(CollectStockCommand.from(stocks));
+        log.info("[CollectStockTradeTickScheduler.collect] 수집시작");
+        List<Stock> stocks = loadCollectEnableStocksUseCase.loadAll();
+//        collectTradeTickDataUseCase.collectAndSave(CollectStockCommand.from(stocks));
+        log.info("[CollectStockTradeTickScheduler.collect] 수집종료");
     }
 }
 
