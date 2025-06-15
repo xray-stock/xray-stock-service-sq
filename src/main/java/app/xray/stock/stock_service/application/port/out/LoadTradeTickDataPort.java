@@ -6,6 +6,5 @@ import java.util.Optional;
 
 public interface LoadTradeTickDataPort {
 
-    // stockId 기준으로 가장 최근 tick 하나 조회
-    Optional<TradeTick> findTopByStockIdOrderByTickAtDesc(String stockId);
+    Optional<TradeTick> loadLastTradeTickDataBy(String stockId);
 }

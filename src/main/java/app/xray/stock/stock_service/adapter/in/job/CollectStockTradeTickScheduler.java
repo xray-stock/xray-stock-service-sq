@@ -21,10 +21,10 @@ public class CollectStockTradeTickScheduler {
 
     @Scheduled(fixedRate = 5000)
     public void collect() {
-        log.info("[CollectStockTradeTickScheduler.collect] 수집시작");
+        log.info("[CollectStockTradeTickScheduler.collect] START");
         List<Stock> stocks = loadCollectEnableStocksUseCase.loadAll();
         collectTradeTickDataUseCase.collectAndSave(CollectStockCommand.from(stocks));
-        log.info("[CollectStockTradeTickScheduler.collect] 수집종료");
+        log.info("[CollectStockTradeTickScheduler.collect] END");
     }
 }
 
