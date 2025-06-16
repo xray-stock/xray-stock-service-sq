@@ -18,12 +18,12 @@ public class StockQueryController {
 
     @GetMapping("/{stockId}/candles")
     public StockCandlesResponse getCandles(
-            @PathVariable String stockId,
-            @RequestParam CandleInterval interval,
-            @RequestParam Instant start,
-            @RequestParam Instant end) {
-        return queryStockCandlesUseCase.queryCandles(StockCandleSearchConditionQuery.withCondition(
-                stockId, interval, start, end));
+            @PathVariable("stockId") String stockId,
+            @RequestParam(required = false) String interval,
+            @RequestParam(required = false) Instant start,
+            @RequestParam(required = false) Instant end) {
+        return queryStockCandlesUseCase.queryCandles(StockCandleSearchConditionQuery
+                .withCondition(stockId, interval, start, end));
     }
 
 

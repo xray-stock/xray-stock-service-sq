@@ -24,10 +24,11 @@ public class StockCandleSearchConditionQuery extends SelfValidating<StockCandleS
     private Instant start;
     private Instant end;
 
-    public static StockCandleSearchConditionQuery withCondition(String stockId, CandleInterval interval, Instant start, Instant end) {
+    public static StockCandleSearchConditionQuery withCondition(String stockId, String interval, Instant start,
+                                                                Instant end) {
         StockCandleSearchConditionQuery query = new StockCandleSearchConditionQuery();
         query.stockId = stockId;
-        query.interval = intervalOrDefault(interval);
+        query.interval = intervalOrDefault(CandleInterval.convertOrDefaultNull(interval));
         query.end = endOrDefault(end);
         query.start = startOrDefaultAfterInitEnd(start, query.end);
 

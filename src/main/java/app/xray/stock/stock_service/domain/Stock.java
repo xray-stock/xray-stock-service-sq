@@ -1,10 +1,11 @@
 package app.xray.stock.stock_service.domain;
 
+import app.xray.stock.stock_service.domain.exception.StockDisabledException;
 import app.xray.stock.stock_service.common.validation.NoBlankSpace;
 import app.xray.stock.stock_service.common.validation.SelfValidating;
+import app.xray.stock.stock_service.domain.exception.StockNotStartedException;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -53,22 +54,26 @@ public class Stock extends SelfValidating<Stock> {
     }
 
     public void start() {
-        if (!enable) {
-            throw new IllegalStateException(); // FIXME custom exception
-        }
+        assertEnabled();
         startedAt = Instant.now();
         endedAt = null;
     }
 
     public void stop() {
         if (startedAt == null) {
-            throw new IllegalStateException(); // FIXME custom exception
+            throw new StockNotStartedException(id);
         }
         endedAt = Instant.now();
     }
 
     public void enable(boolean enable) {
         this.enable = enable;
+    }
+
+    public void assertEnabled() {
+        if (enable == null || !enable) {
+            throw new StockDisabledException(id);
+        }
     }
 
     /**

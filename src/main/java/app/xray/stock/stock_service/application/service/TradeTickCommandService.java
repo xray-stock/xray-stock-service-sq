@@ -1,13 +1,12 @@
 package app.xray.stock.stock_service.application.service;
 
 import app.xray.stock.stock_service.adapter.out.external.dto.TradeTickDataResponse;
-import app.xray.stock.stock_service.adapter.out.persistance.MongoTradeTickRepository;
 import app.xray.stock.stock_service.application.port.in.CollectTradeTickDataUseCase;
 import app.xray.stock.stock_service.application.port.out.LoadTradeTickDataPort;
 import app.xray.stock.stock_service.application.port.out.SaveTradeTickDataPort;
 import app.xray.stock.stock_service.application.port.out.StockGeneratorClient;
 import app.xray.stock.stock_service.application.port.vo.CollectStockCommand;
-import app.xray.stock.stock_service.common.exception.NoTradeTickCollectedException;
+import app.xray.stock.stock_service.application.service.exception.NoTradeTickCollectedException;
 import app.xray.stock.stock_service.domain.Stock;
 import app.xray.stock.stock_service.domain.TradeTick;
 import lombok.RequiredArgsConstructor;
