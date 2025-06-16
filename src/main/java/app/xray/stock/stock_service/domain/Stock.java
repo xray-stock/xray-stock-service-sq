@@ -1,5 +1,6 @@
 package app.xray.stock.stock_service.domain;
 
+import app.xray.stock.stock_service.common.validation.NoBlankSpace;
 import app.xray.stock.stock_service.common.validation.SelfValidating;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -25,7 +26,7 @@ public class Stock extends SelfValidating<Stock> {
     @NotNull
     private MarketType marketType;
     @NotBlank
-    @Pattern(regexp = "^\\S*$", message = "symbol must not be contained space blank.")
+    @NoBlankSpace
     private String symbol;
     @NotBlank
     private String name;
