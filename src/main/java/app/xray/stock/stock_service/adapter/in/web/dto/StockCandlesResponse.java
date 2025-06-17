@@ -1,6 +1,6 @@
 package app.xray.stock.stock_service.adapter.in.web.dto;
 
-import app.xray.stock.stock_service.common.type.CandleInterval;
+import app.xray.stock.stock_service.common.type.CandleIntervalType;
 import app.xray.stock.stock_service.domain.vo.Candle;
 import app.xray.stock.stock_service.domain.vo.TimeRange;
 import lombok.AllArgsConstructor;
@@ -22,7 +22,7 @@ public class StockCandlesResponse {
     private String interval;
     private List<CandleData> candles;
 
-    public static StockCandlesResponse of(String stockId, CandleInterval interval, List<Candle> candles) {
+    public static StockCandlesResponse of(String stockId, CandleIntervalType interval, List<Candle> candles) {
         StockCandlesResponse response = new StockCandlesResponse();
         response.stockId = stockId;
         response.interval = interval.getValue();

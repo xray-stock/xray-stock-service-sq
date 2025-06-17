@@ -3,7 +3,6 @@ package app.xray.stock.stock_service.adapter.in.web;
 import app.xray.stock.stock_service.adapter.in.web.dto.StockCandlesResponse;
 import app.xray.stock.stock_service.application.port.in.QueryStockCandlesUseCase;
 import app.xray.stock.stock_service.application.port.vo.StockCandleSearchConditionQuery;
-import app.xray.stock.stock_service.common.type.CandleInterval;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

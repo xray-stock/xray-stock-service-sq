@@ -1,6 +1,6 @@
 package app.xray.stock.stock_service.domain;
 
-import app.xray.stock.stock_service.common.type.CandleInterval;
+import app.xray.stock.stock_service.common.type.CandleIntervalType;
 import app.xray.stock.stock_service.domain.vo.Candle;
 import app.xray.stock.stock_service.domain.vo.TimeRange;
 import org.springframework.util.Assert;
@@ -12,13 +12,12 @@ import java.util.List;
 public class TradeTicksCandleConverter {
 
     private TimeRange timeRange;
-
-    private CandleInterval interval;
+    private CandleIntervalType interval;
     private List<TradeTick> tradeTicks;
     private List<Candle> candles;
 
     public static TradeTicksCandleConverter forConverting(
-            TimeRange timeRange, CandleInterval interval, List<TradeTick> tradeTicks) {
+            TimeRange timeRange, CandleIntervalType interval, List<TradeTick> tradeTicks) {
         Assert.notNull(timeRange, "timeRange must not be null");
         Assert.notNull(interval, "interval must not be null");
         Assert.notEmpty(tradeTicks, "tradeTicks must not be empty");
@@ -32,7 +31,7 @@ public class TradeTicksCandleConverter {
     }
 
 
-    public void aggregate() {
+    public void aggregate(boolean includeEmptySlots) {
         List<TimeRange> ranges = timeRange.makeIntervals(interval);
         List<Candle> result = new ArrayList<>();
 
@@ -43,7 +42,9 @@ public class TradeTicksCandleConverter {
                     .toList();
 
             if (ticksInRange.isEmpty()) {
-                result.add(Candle.onlyRange(range));
+                if (includeEmptySlots) {
+                    result.add(Candle.onlyRange(range));
+                }
                 continue;
             }
 

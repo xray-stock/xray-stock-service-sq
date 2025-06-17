@@ -6,7 +6,7 @@ import app.xray.stock.stock_service.application.port.out.LoadStockDataPort;
 import app.xray.stock.stock_service.application.port.out.LoadTradeTickDataPort;
 import app.xray.stock.stock_service.application.port.vo.StockCandleSearchConditionQuery;
 import app.xray.stock.stock_service.common.exception.NotFoundException;
-import app.xray.stock.stock_service.common.type.CandleInterval;
+import app.xray.stock.stock_service.common.type.CandleIntervalType;
 import app.xray.stock.stock_service.domain.Stock;
 import app.xray.stock.stock_service.domain.TradeTick;
 import app.xray.stock.stock_service.domain.TradeTicksCandleConverter;
@@ -32,7 +32,7 @@ public class StockCandlesQueryService implements QueryStockCandlesUseCase {
 
         // 주식 기본 정보 조회
         String stockId = query.getStockId();
-        CandleInterval interval = query.getInterval();
+        CandleIntervalType interval = query.getInterval();
         loadStockDataPort.findOneById(stockId).orElseThrow(() -> NotFoundException.of(Stock.class, stockId))
                 .assertEnabled();
 
@@ -44,7 +44,7 @@ public class StockCandlesQueryService implements QueryStockCandlesUseCase {
 
         TradeTicksCandleConverter converter = TradeTicksCandleConverter.forConverting(
                 TimeRange.of(start, end), interval, tradeTicks);
-        converter.aggregate();
+        converter.aggregate(false);
         List<Candle> candles = converter.getCandles();
 
         return StockCandlesResponse.of(stockId, interval, candles);

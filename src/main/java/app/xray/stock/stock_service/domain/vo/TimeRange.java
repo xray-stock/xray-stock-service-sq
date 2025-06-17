@@ -1,6 +1,6 @@
 package app.xray.stock.stock_service.domain.vo;
 
-import app.xray.stock.stock_service.common.type.CandleInterval;
+import app.xray.stock.stock_service.common.type.CandleIntervalType;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ public record TimeRange(Instant start, Instant end) {
         return new TimeRange(start, end);
     }
 
-    public List<TimeRange> makeIntervals(CandleInterval interval) {
+    public List<TimeRange> makeIntervals(CandleIntervalType interval) {
         List<TimeRange> ranges = new ArrayList<>();
 
         Instant cursor = start;
