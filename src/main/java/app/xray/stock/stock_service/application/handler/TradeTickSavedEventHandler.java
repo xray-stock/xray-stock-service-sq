@@ -19,8 +19,10 @@ public class TradeTickSavedEventHandler {
     @Async
     @EventListener
     public void handleTradeTickSavedEvent(TradeTickSavedEvent event) {
-        log.info("[TradeTickSavedEventHandler.handleTradeTickSavedEvent] stockId={}, timeRange.start={}, timeRange" +
-                        ".end={}",
+        log.info("[TradeTickSavedEventHandler.handleTradeTickSavedEvent] " +
+                        "stockId={}, " +
+                        "timeRange.start={}, " +
+                        "timeRange.end={}",
                 event.stockId(), event.start(), event.end());
         service.updateTradingInfo(event.stockId());
     }

@@ -1,9 +1,12 @@
 package app.xray.stock.stock_service.adapter.in.web;
 
+import app.xray.stock.stock_service.application.port.in.QueryStockListUseCase;
 import app.xray.stock.stock_service.adapter.in.web.dto.StockCandlesResponse;
 import app.xray.stock.stock_service.adapter.in.web.dto.StockListResponse;
 import app.xray.stock.stock_service.application.port.in.QueryStockCandlesUseCase;
 import app.xray.stock.stock_service.application.port.vo.StockCandleSearchConditionQuery;
+import app.xray.stock.stock_service.application.port.vo.StockListQuery;
+import app.xray.stock.stock_service.domain.Stock;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,13 +18,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StockQueryController {
 
+    private final QueryStockListUseCase queryStockListUseCase;
     private final QueryStockCandlesUseCase queryStockCandlesUseCase;
 
     @GetMapping
-    public StockListResponse getStocks(
-            @RequestParam("") String sort
-    ) {
-        return new StockListResponse(List.of());
+    public StockListResponse getStocks(@RequestParam("marketCode") String marketCode) {
+        List<Stock> stocks = queryStockListUseCase.queryStockTopRoiRank(StockListQuery.from(marketCode));
+        return StockListResponse.from(stocks);
     }
 
     @GetMapping("/{stockId}/candles")
