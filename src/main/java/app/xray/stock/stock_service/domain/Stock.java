@@ -89,9 +89,39 @@ public class Stock extends SelfValidating<Stock> {
 
     public boolean needsToUpdatePreviousCandle() {
         if (previousCandle == null) return true;
-        LocalDate currentDate = currentTradeTick.getTickAt().atZone(marketType.zoneId).toLocalDate();
-        LocalDate previousEndDate = previousCandle.getTimeRange().end().atZone(marketType.zoneId).toLocalDate();
-        return previousEndDate.isBefore(currentDate.minusDays(1));
+
+        ZoneId zoneId = marketType.zoneId;
+        LocalDate currentDate = currentTradeTick.getTickAt().atZone(zoneId).toLocalDate();
+        LocalDate expectedPreviousCandleDate = getPreviousBusinessDay(currentDate);
+
+        LocalDate actualPreviousCandleDate = previousCandle.getTimeRange().end().atZone(zoneId).toLocalDate();
+        return actualPreviousCandleDate.isBefore(expectedPreviousCandleDate);
+    }
+
+    private LocalDate getPreviousBusinessDay(LocalDate date) {
+        LocalDate d = date.minusDays(1);
+        while (isHoliday(d)) {
+            d = d.minusDays(1);
+        }
+        return d;
+    }
+
+    private boolean isHoliday(LocalDate date) {
+        return isWeekend(date) || isNationalHoliday(date);
+        // 추가로 공휴일 리스트 포함하려면 이 메서드 확장 가능
+    }
+
+    private boolean isWeekend(LocalDate date) {
+        DayOfWeek day = date.getDayOfWeek();
+        return day == DayOfWeek.SATURDAY || day == DayOfWeek.SUNDAY;
+    }
+
+    private boolean isNationalHoliday(LocalDate date) {
+        return List.of(
+                LocalDate.of(2025, 1, 1),   // 신정
+                LocalDate.of(2025, 3, 1),   // 삼일절
+                LocalDate.of(2025, 6, 6)    // 현충일 등등
+        ).contains(date);
     }
 
     public void updatePreviousCandleWith(List<TradeTick> yesterdayTicks) {
