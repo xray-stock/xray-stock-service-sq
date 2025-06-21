@@ -2,18 +2,21 @@ package app.xray.stock.stock_service.domain.vo;
 
 import app.xray.stock.stock_service.common.validation.SelfValidating;
 import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Candle extends SelfValidating<Candle> {
 
     @NotNull
-    private final TimeRange timeRange;
-    private final Double open;
-    private final Double high;
-    private final Double low;
-    private final Double close;
-    private final Long volume;
+    private TimeRange timeRange;
+    private Double open;
+    private Double high;
+    private Double low;
+    private Double close;
+    private Long volume;
 
     private Candle(TimeRange timeRange, Double open, Double high, Double low, Double close, Long volume) {
         this.timeRange = timeRange;

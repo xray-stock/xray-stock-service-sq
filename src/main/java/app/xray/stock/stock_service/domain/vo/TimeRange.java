@@ -2,10 +2,7 @@ package app.xray.stock.stock_service.domain.vo;
 
 import app.xray.stock.stock_service.common.type.CandleIntervalType;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +14,13 @@ public record TimeRange(Instant start, Instant end) {
 
     public static TimeRange of(Instant start, Instant end) {
         return new TimeRange(start, end);
+    }
+
+    public static TimeRange ofYesterday(Instant baseTime, ZoneId zoneId) {
+        LocalDate date = baseTime.atZone(zoneId).toLocalDate().minusDays(1);
+        Instant start = date.atStartOfDay(zoneId).toInstant();
+        Instant end = date.plusDays(1).atStartOfDay(zoneId).minusNanos(1).toInstant();
+        return of(start, end);
     }
 
     /**

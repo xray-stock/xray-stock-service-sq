@@ -7,10 +7,13 @@ import app.xray.stock.stock_service.application.port.out.SaveTradeTickDataPort;
 import app.xray.stock.stock_service.application.port.out.StockGeneratorClient;
 import app.xray.stock.stock_service.application.port.vo.CollectStockCommand;
 import app.xray.stock.stock_service.application.service.exception.NoTradeTickCollectedException;
+import app.xray.stock.stock_service.common.event.TradeTickSavedEvent;
 import app.xray.stock.stock_service.domain.Stock;
 import app.xray.stock.stock_service.domain.TradeTick;
+import app.xray.stock.stock_service.domain.vo.TimeRange;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -26,6 +29,8 @@ public class TradeTickCommandService implements CollectTradeTickDataUseCase {
     private final SaveTradeTickDataPort saveTradeTickDataPort;
 
     private final StockGeneratorClient stockGeneratorClient;
+
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public void collectAndSave(CollectStockCommand command) {
@@ -46,8 +51,9 @@ public class TradeTickCommandService implements CollectTradeTickDataUseCase {
             // 저장 처리 진행
             saveTradeTickDataPort.saveAll(TradeTick.fromResponses(
                     stock.getId(), rangeTradeTicksResponse));
-            // TODO lastCollectedAt 정보 저장하기
 
+            // 이벤트 발행
+            eventPublisher.publishEvent(new TradeTickSavedEvent(stock.getId(), start, end));
         }
     }
 }

@@ -59,4 +59,16 @@ public class TradeTick extends SelfValidating<TradeTick> {
         tick.validateSelf();
         return tick;
     }
+
+    public void updateChangeRate(double close) {
+        if (close == 0.0) {
+            clearChangeRate();
+            return;
+        }
+        this.changeRate = ((this.price - close) / close) * 100.0;
+    }
+
+    public void clearChangeRate() {
+        this.changeRate = 0.0;
+    }
 }
