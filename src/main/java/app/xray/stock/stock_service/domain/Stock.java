@@ -1,9 +1,12 @@
 package app.xray.stock.stock_service.domain;
 
-import app.xray.stock.stock_service.domain.exception.StockDisabledException;
+import app.xray.stock.stock_service.common.type.CandleIntervalType;
 import app.xray.stock.stock_service.common.validation.NoBlankSpace;
 import app.xray.stock.stock_service.common.validation.SelfValidating;
+import app.xray.stock.stock_service.domain.exception.StockDisabledException;
 import app.xray.stock.stock_service.domain.exception.StockNotStartedException;
+import app.xray.stock.stock_service.domain.vo.Candle;
+import app.xray.stock.stock_service.domain.vo.TimeRange;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -13,8 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.Instant;
-import java.time.ZoneId;
+import java.time.*;
+import java.util.List;
 import java.util.Locale;
 
 @Document(collection = "stocks")
@@ -38,6 +41,9 @@ public class Stock extends SelfValidating<Stock> {
     private Instant endedAt;
 
     private Instant createAt;
+
+    private TradeTick currentTradeTick;
+    private Candle previousCandle;
 
     public static Stock create(MarketType marketType, String symbol, String name) {
         Stock stock = new Stock();
@@ -77,6 +83,35 @@ public class Stock extends SelfValidating<Stock> {
         }
     }
 
+    public void updateCurrentTradeTick(TradeTick currentTradeTick) {
+        this.currentTradeTick = currentTradeTick;
+    }
+
+    public boolean needsToUpdatePreviousCandle() {
+        if (previousCandle == null) return true;
+        LocalDate currentDate = currentTradeTick.getTickAt().atZone(marketType.zoneId).toLocalDate();
+        LocalDate previousEndDate = previousCandle.getTimeRange().end().atZone(marketType.zoneId).toLocalDate();
+        return previousEndDate.isBefore(currentDate.minusDays(1));
+    }
+
+    public void updatePreviousCandleWith(List<TradeTick> yesterdayTicks) {
+        if (yesterdayTicks.isEmpty()) return;
+        TimeRange range = getYesterdayTimeRange(currentTradeTick);
+        TradeTicksCandleConverter converter = TradeTicksCandleConverter
+                .forConverting(marketType, range, CandleIntervalType.ONE_DAY, yesterdayTicks);
+        converter.aggregate(false);
+        this.previousCandle = converter.getCandles().getFirst();
+    }
+
+    private TimeRange getYesterdayTimeRange(TradeTick baseTick) {
+        ZoneId zoneId = marketType.getZoneId();
+        LocalDate yesterday = baseTick.getTickAt().atZone(zoneId).toLocalDate().minusDays(1);
+        Instant start = yesterday.atStartOfDay(zoneId).toInstant();
+        Instant end = yesterday.plusDays(1).atStartOfDay(zoneId).minusNanos(1).toInstant();
+        return TimeRange.of(start, end);
+    }
+
+
     /**
      * MarketType 는 시장 구분을 정의하는 enum 입니다.
      * <pre>
@@ -86,12 +121,35 @@ public class Stock extends SelfValidating<Stock> {
     @Getter
     @RequiredArgsConstructor
     public enum MarketType {
-        KOSPI(Locale.KOREA, ZoneId.of("Asia/Seoul"), 0),
-        NASDAQ(Locale.US, ZoneId.of("America/New_York"), 2);
+        KOSPI(
+                Locale.KOREA,
+                ZoneId.of("Asia/Seoul"),
+                0,
+                LocalTime.of(9, 0),
+                LocalTime.of(15, 30)
+        ),
+        NASDAQ(
+                Locale.US,
+                ZoneId.of("America/New_York"),
+                2,
+                LocalTime.of(9, 30),
+                LocalTime.of(16, 0)
+        );
 
         private final Locale locale;
         private final ZoneId zoneId;
         private final int decimalPlaces;
+        private final LocalTime marketOpenTime;
+        private final LocalTime marketCloseTime;
+
+        /**
+         * 현재 시간이 장중인지 확인 (해당 시장 기준)
+         */
+        public boolean isMarketOpenNow(Instant now) {
+            ZonedDateTime zonedNow = now.atZone(zoneId);
+            LocalTime localTime = zonedNow.toLocalTime();
+            return !localTime.isBefore(marketOpenTime) && localTime.isBefore(marketCloseTime);
+        }
     }
 }
 
