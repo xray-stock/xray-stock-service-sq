@@ -1,4 +1,4 @@
-package app.xray.stock.stock_service.common.exception;
+package app.xray.stock.stock_service.application.service.exception;
 
 import java.time.Instant;
 
