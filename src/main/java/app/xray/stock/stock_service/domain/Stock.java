@@ -85,6 +85,11 @@ public class Stock extends SelfValidating<Stock> {
 
     public void updateCurrentTradeTick(TradeTick currentTradeTick) {
         this.currentTradeTick = currentTradeTick;
+        if (previousCandle == null || previousCandle.getClose() == null) {
+            this.currentTradeTick.clearChangeRate();
+            return;
+        }
+        this.currentTradeTick.updateChangeRate(previousCandle.getClose());
     }
 
     public boolean needsToUpdatePreviousCandle() {
@@ -156,14 +161,16 @@ public class Stock extends SelfValidating<Stock> {
                 ZoneId.of("Asia/Seoul"),
                 0,
                 LocalTime.of(9, 0),
-                LocalTime.of(15, 30)
+                LocalTime.of(15, 30),
+                30.0
         ),
         NASDAQ(
                 Locale.US,
                 ZoneId.of("America/New_York"),
                 2,
                 LocalTime.of(9, 30),
-                LocalTime.of(16, 0)
+                LocalTime.of(16, 0),
+                null
         );
 
         private final Locale locale;
@@ -171,6 +178,11 @@ public class Stock extends SelfValidating<Stock> {
         private final int decimalPlaces;
         private final LocalTime marketOpenTime;
         private final LocalTime marketCloseTime;
+        private final Double limitUpRatePercent;
+
+        public boolean isLimitUp(double changeRate) {
+            return limitUpRatePercent != null && changeRate >= (limitUpRatePercent * 0.99); // 29.7 for 30%
+        }
 
         /**
          * 현재 시간이 장중인지 확인 (해당 시장 기준)
