@@ -33,8 +33,8 @@ public class StockCandlesQueryService implements QueryStockCandlesUseCase {
         // 주식 기본 정보 조회
         String stockId = query.getStockId();
         CandleIntervalType interval = query.getInterval();
-        loadStockDataPort.findOneById(stockId).orElseThrow(() -> NotFoundException.of(Stock.class, stockId))
-                .assertEnabled();
+        Stock stock = loadStockDataPort.findOneById(stockId).orElseThrow(() -> NotFoundException.of(Stock.class, stockId));
+        stock.assertEnabled();
 
         // 주식 차트 정보 조회
         Instant start = query.getStart();
@@ -42,8 +42,7 @@ public class StockCandlesQueryService implements QueryStockCandlesUseCase {
 
         List<TradeTick> tradeTicks = loadTradeTickDataPort.loadTradeTicksDataByRange(stockId, start, end);
 
-        TradeTicksCandleConverter converter = TradeTicksCandleConverter.forConverting(
-                TimeRange.of(start, end), interval, tradeTicks);
+        TradeTicksCandleConverter converter = TradeTicksCandleConverter.forConverting(stock.getMarketType(), TimeRange.of(start, end), interval, tradeTicks);
         converter.aggregate(false);
         List<Candle> candles = converter.getCandles();
 

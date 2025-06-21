@@ -14,6 +14,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.Locale;
 
 @Document(collection = "stocks")
@@ -85,10 +86,11 @@ public class Stock extends SelfValidating<Stock> {
     @Getter
     @RequiredArgsConstructor
     public enum MarketType {
-        KOSPI(Locale.KOREA, 0),
-        NASDAQ(Locale.US, 2);
+        KOSPI(Locale.KOREA, ZoneId.of("Asia/Seoul"), 0),
+        NASDAQ(Locale.US, ZoneId.of("America/New_York"), 2);
 
         private final Locale locale;
+        private final ZoneId zoneId;
         private final int decimalPlaces;
     }
 }
