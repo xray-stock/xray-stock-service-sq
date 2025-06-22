@@ -32,9 +32,30 @@ public class StockCandleSearchConditionQuery extends SelfValidating<StockCandleS
         query.interval = intervalOrDefault(CandleIntervalType.convertOrDefaultNull(interval));
         query.end = endOrDefaultWithTruncating(end);
         query.start = startOrDefaultAfterInitEndWithTruncating(start, query.end);
-
+        query.validateTimeRange();
         query.validateSelf();
         return query;
+    }
+
+    private void validateTimeRange() {
+        if (!start.isBefore(end)) {
+            throw new IllegalArgumentException("Start time must be before end time.");
+        }
+
+        Duration requested = Duration.between(start, end);
+
+        // 최소 범위 조건
+        if (requested.compareTo(interval.getDuration().multipliedBy(2)) < 0) {
+            throw new IllegalArgumentException(
+                    String.format("Date range must be at least %s × 2 (%s). start=%s, end=%s",
+                            interval.getDuration(), interval.getMinRange(), start, end));
+        }
+        // 기간 최대 범위 조건
+        if (requested.compareTo(interval.getMaxRange()) > 0) {
+            throw new IllegalArgumentException(
+                    String.format("Date range exceeds the allowed maximum of %d days for interval '%s'. start=%s, end=%s",
+                            interval.getMaxRange().toDays(), interval.getValue(), start, end));
+        }
     }
 
     private static CandleIntervalType intervalOrDefault(CandleIntervalType interval) {
