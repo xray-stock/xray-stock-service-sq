@@ -9,6 +9,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.util.List;
 
 @Log4j2
@@ -22,8 +23,9 @@ public class CollectStockTradeTickScheduler {
     @Scheduled(fixedRate = 5000)
     public void collect() {
         log.info("[CollectStockTradeTickScheduler.collect] START");
-        List<Stock> stocks = loadCollectEnableStocksUseCase.loadAll();
-        collectTradeTickDataUseCase.collectAndSave(CollectStockCommand.from(stocks));
+        Instant now = Instant.now();
+        List<Stock> stocks = loadCollectEnableStocksUseCase.loadAll(now);
+        collectTradeTickDataUseCase.collectAndSave(CollectStockCommand.of(stocks, now));
         log.info("[CollectStockTradeTickScheduler.collect] END");
     }
 }

@@ -8,6 +8,7 @@ import app.xray.stock.stock_service.domain.Stock;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 
@@ -29,7 +30,9 @@ public class StockQueryService implements QueryStockListUseCase, LoadCollectEnab
     }
 
     @Override
-    public List<Stock> loadAll() {
-        return loadStockListDataPort.findAllByEnableIsTrue();
+    public List<Stock> loadAll(Instant now) {
+        return loadStockListDataPort.findAllByEnableIsTrue().stream()
+                .filter(each ->  each.getMarketType().isMarketOpenNow(now))
+                .toList();
     }
 }

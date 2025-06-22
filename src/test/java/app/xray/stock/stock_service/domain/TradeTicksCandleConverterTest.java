@@ -1,7 +1,7 @@
 package app.xray.stock.stock_service.domain;
 
 import app.xray.stock.stock_service.common.type.CandleIntervalType;
-import app.xray.stock.stock_service.domain.Stock.MarketType;
+import app.xray.stock.stock_service.domain.type.MarketType;
 import app.xray.stock.stock_service.domain.vo.Candle;
 import app.xray.stock.stock_service.domain.vo.TimeRange;
 import org.junit.jupiter.api.Test;

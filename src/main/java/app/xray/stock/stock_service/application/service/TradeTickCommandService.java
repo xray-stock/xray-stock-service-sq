@@ -35,7 +35,7 @@ public class TradeTickCommandService implements CollectTradeTickDataUseCase {
     public void collectAndSave(CollectStockCommand command) {
         for (Stock stock : command.getStocks()) {
             Optional<TradeTick> optionalLastTradeTick = loadTradeTickDataPort.loadLastTradeTickDataBy(stock.getId());
-            Instant end = Instant.now();
+            Instant end = command.getAt();
             Instant start = optionalLastTradeTick.isEmpty() ? end.minusSeconds(5) : optionalLastTradeTick.get().getTickAt();
             List<TradeTickDataResponse> rangeTradeTicksResponse = stockGeneratorClient.getRangeTradeTicks(stock.getSymbol(), start, end);
             if (rangeTradeTicksResponse.isEmpty()) {
