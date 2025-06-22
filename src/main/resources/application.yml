@@ -10,8 +10,24 @@ spring:
       username: ${MONGO_USER}
       password: ${MONGO_PASS}
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+  endpoint:
+    prometheus:
+      enabled: true
+
 server:
   port: 8081
+  tomcat:
+    mbeanregistry:
+      enabled: true
 
 endpoint:
   stock-generator:
