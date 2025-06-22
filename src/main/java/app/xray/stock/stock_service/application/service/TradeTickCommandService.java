@@ -10,7 +10,6 @@ import app.xray.stock.stock_service.application.service.exception.NoTradeTickCol
 import app.xray.stock.stock_service.common.event.TradeTickSavedEvent;
 import app.xray.stock.stock_service.domain.Stock;
 import app.xray.stock.stock_service.domain.TradeTick;
-import app.xray.stock.stock_service.domain.vo.TimeRange;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.ApplicationEventPublisher;
