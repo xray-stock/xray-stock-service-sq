@@ -18,7 +18,7 @@ import java.time.Instant;
 import java.util.List;
 
 @Document(collection = "trade_ticks")
-@TimeSeries(timeField = "tickAt", metaField = "stockId", granularity = Granularity.SECONDS)
+@TimeSeries(timeField = "tickAt", metaField = "stockId", granularity = Granularity.SECONDS, expireAfter = "30d")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class TradeTick extends SelfValidating<TradeTick> {
