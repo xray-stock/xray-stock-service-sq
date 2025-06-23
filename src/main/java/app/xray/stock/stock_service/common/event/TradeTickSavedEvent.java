@@ -1,6 +1,9 @@
 package app.xray.stock.stock_service.common.event;
 
 
-import java.time.Instant;
+import app.xray.stock.stock_service.domain.TradeTick;
 
-public record TradeTickSavedEvent(String stockId, Instant start, Instant end) { }
+import java.time.Instant;
+import java.util.List;
+
+public record TradeTickSavedEvent(String stockId, Instant start, Instant end, List<TradeTick> data) { }

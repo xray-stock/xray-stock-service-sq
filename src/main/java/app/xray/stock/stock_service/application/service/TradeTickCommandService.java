@@ -47,12 +47,12 @@ public class TradeTickCommandService implements CollectTradeTickDataUseCase {
                     rangeTradeTicksResponse.size(),
                     start, end);
 
-            // 저장 처리 진행
-            saveTradeTickDataPort.saveAll(TradeTick.fromResponses(
-                    stock.getId(), rangeTradeTicksResponse));
+            // 변화 후 저장 처리 진행
+            List<TradeTick> tradeTicks = TradeTick.fromResponses(stock.getId(), rangeTradeTicksResponse);
+            saveTradeTickDataPort.saveAll(tradeTicks);
 
             // 이벤트 발행
-            eventPublisher.publishEvent(new TradeTickSavedEvent(stock.getId(), start, end));
+            eventPublisher.publishEvent(new TradeTickSavedEvent(stock.getId(), start, end, tradeTicks));
         }
     }
 }
