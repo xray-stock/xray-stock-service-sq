@@ -16,6 +16,12 @@ public record TimeRange(Instant start, Instant end) {
         return new TimeRange(start, end);
     }
 
+    public static TimeRange forDay(LocalDate date, ZoneId zoneId) {
+        Instant start = date.atStartOfDay(zoneId).toInstant();
+        Instant end = date.plusDays(1).atStartOfDay(zoneId).minusNanos(1).toInstant();
+        return new TimeRange(start, end);
+    }
+
     public static TimeRange ofYesterday(Instant baseTime, ZoneId zoneId) {
         LocalDate date = baseTime.atZone(zoneId).toLocalDate().minusDays(1);
         Instant start = date.atStartOfDay(zoneId).toInstant();

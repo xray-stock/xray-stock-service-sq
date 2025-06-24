@@ -104,6 +104,17 @@ public class Stock extends SelfValidating<Stock> {
         return actualPreviousCandleDate.isBefore(expectedPreviousCandleDate);
     }
 
+    public TimeRange getPreviousBusinessDayTimeRange() {
+        if (currentTradeTick == null) {
+            return null;
+        }
+        ZoneId zoneId = marketType.getZoneId();
+        LocalDate previousBusinessDay =
+                getPreviousBusinessDay(currentTradeTick.getTickAt().atZone(zoneId).toLocalDate());
+
+        return TimeRange.forDay(previousBusinessDay, zoneId);
+    }
+
     private LocalDate getPreviousBusinessDay(LocalDate date) {
         LocalDate d = date.minusDays(1);
         while (marketType.isHoliday(d)) {
@@ -112,21 +123,12 @@ public class Stock extends SelfValidating<Stock> {
         return d;
     }
 
-    public void updatePreviousCandleWith(List<TradeTick> yesterdayTicks) {
-        if (yesterdayTicks.isEmpty()) return;
-        TimeRange range = getYesterdayTimeRange(currentTradeTick);
+    public void updatePreviousCandleWith(TimeRange previousTimeRange, List<TradeTick> previousTicks) {
+        if (previousTicks.isEmpty()) return;
         TradeTicksCandleConverter converter = TradeTicksCandleConverter
-                .forConverting(marketType, range, CandleIntervalType.ONE_DAY, yesterdayTicks);
+                .forConverting(marketType, previousTimeRange, CandleIntervalType.ONE_DAY, previousTicks);
         converter.aggregate(false);
         this.previousCandle = converter.getCandles().getFirst();
-    }
-
-    private TimeRange getYesterdayTimeRange(TradeTick baseTick) {
-        ZoneId zoneId = marketType.getZoneId();
-        LocalDate yesterday = baseTick.getTickAt().atZone(zoneId).toLocalDate().minusDays(1);
-        Instant start = yesterday.atStartOfDay(zoneId).toInstant();
-        Instant end = yesterday.plusDays(1).atStartOfDay(zoneId).minusNanos(1).toInstant();
-        return TimeRange.of(start, end);
     }
 }
 

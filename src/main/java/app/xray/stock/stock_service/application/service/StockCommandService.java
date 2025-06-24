@@ -59,11 +59,11 @@ public class StockCommandService implements SaveStockUseCase, StartCollectingSto
                 .orElseThrow();
 
         if (stock.needsToUpdatePreviousCandle()) {
-            TimeRange range = TimeRange.ofYesterday(current.getTickAt(), stock.getMarketType().getZoneId());
-            List<TradeTick> yesterdayTicks = loadTradeTickDataPort
-                    .loadTradeTicksDataByRange(stockId, range.start(), range.end());
+            TimeRange previousBusinessDayTimeRange = stock.getPreviousBusinessDayTimeRange();
+            List<TradeTick> previousTicks = loadTradeTickDataPort
+                    .loadTradeTicksDataByRange(stockId, previousBusinessDayTimeRange.start(), previousBusinessDayTimeRange.end());
 
-            stock.updatePreviousCandleWith(yesterdayTicks);
+            stock.updatePreviousCandleWith(previousBusinessDayTimeRange, previousTicks);
         }
         stock.updateCurrentTradeTick(current);
         saveStockDataPort.save(stock);
