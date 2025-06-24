@@ -10,6 +10,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Log4j2
@@ -23,7 +24,7 @@ public class CollectStockTradeTickScheduler {
     @Scheduled(fixedRate = 5000)
     public void collect() {
         log.info("[CollectStockTradeTickScheduler.collect] START");
-        Instant now = Instant.now();
+        Instant now = Instant.now().truncatedTo(ChronoUnit.SECONDS);
         List<Stock> stocks = loadCollectEnableStocksUseCase.loadAll(now);
         collectTradeTickDataUseCase.collectAndSave(CollectStockCommand.of(stocks, now));
         log.info("[CollectStockTradeTickScheduler.collect] END");

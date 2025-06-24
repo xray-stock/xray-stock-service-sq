@@ -4,11 +4,12 @@ import app.xray.stock.stock_service.adapter.in.socket.dto.TradeTickMessage;
 import app.xray.stock.stock_service.domain.TradeTick;
 import com.corundumstudio.socketio.SocketIOServer;
 import jakarta.annotation.PostConstruct;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
+
+import java.time.Instant;
+import java.util.List;
 
 @Log4j2
 @Component
@@ -37,15 +38,14 @@ public class TradeTickSocketGateway {
     }
 
     // 특정 stockId 방에 TradeTick 정보 broadcast
-    public void sendTickToRoom(String symbol, TradeTick tick) {
-        var room = server.getRoomOperations(symbol);
-
+    public void sendTickToRoom(String stockId, Instant start, Instant end, List<TradeTick> tradeTicks) {
+        var room = server.getRoomOperations(stockId);
         // 방에 클라이언트가 1명 이상 있는 경우에만 전송
         if (!room.getClients().isEmpty()) {
-            log.debug("✅ Broadcasting tick to {} clients in room {}", room.getClients().size(), symbol);
-            room.sendEvent("tickUpdate", TradeTickMessage.from(tick));
+            log.debug("✅ Broadcasting tradeTicks to {} clients in room {}", room.getClients().size(), stockId);
+            room.sendEvent("tickUpdate", TradeTickMessage.of(stockId, start, end, tradeTicks));
         } else {
-            log.debug("⏸️ No clients in room {} — skip broadcasting", symbol);
+            log.debug("⏸️ No clients in room {} — skip broadcasting", stockId);
         }
     }
 }

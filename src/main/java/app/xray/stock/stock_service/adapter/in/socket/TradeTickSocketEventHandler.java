@@ -18,9 +18,7 @@ public class TradeTickSocketEventHandler {
     @Async
     @EventListener
     public void onTradeTickSaved(TradeTickSavedEvent event) {
-        for (TradeTick tick : event.data()) {
-            log.debug("[TradeTickSocketEventHandler] broadcasting tick: {} to {}", tick.getPrice(), tick.getStockId());
-            socketGateway.sendTickToRoom(tick.getStockId(), tick);
-        }
+        log.debug("[TradeTickSocketEventHandler] broadcasting event: {}", event);
+        socketGateway.sendTickToRoom(event.stockId(), event.start(), event.end(), event.data());
     }
 }
