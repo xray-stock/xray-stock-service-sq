@@ -37,5 +37,5 @@ endpoint:
   stock-generator:
     base-url: http://localhost:8080/api/v1
 
-socketio:
-  secret-key: ${SOCKETIO_SECRET_KEY:6c9d9411-9727-47c4-9d76-64dcfb761083}
+jwt:
+  secret: ${JWT_SECRET:change-me-jwt-secret-aabbccddeeff11223344556677889900aabbccddeeff1122}
