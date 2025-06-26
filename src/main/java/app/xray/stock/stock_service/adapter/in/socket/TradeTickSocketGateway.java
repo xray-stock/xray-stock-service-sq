@@ -40,12 +40,31 @@ public class TradeTickSocketGateway {
     // 특정 stockId 방에 TradeTick 정보 broadcast
     public void sendTickToRoom(String stockId, Instant start, Instant end, List<TradeTick> tradeTicks) {
         var room = server.getRoomOperations(stockId);
-        // 방에 클라이언트가 1명 이상 있는 경우에만 전송
-        if (!room.getClients().isEmpty()) {
-            log.debug("✅ Broadcasting tradeTicks to {} clients in room {}", room.getClients().size(), stockId);
-            room.sendEvent("tickUpdate", TradeTickMessage.of(stockId, start, end, tradeTicks));
-        } else {
+
+        if (room.getClients().isEmpty()) {
             log.debug("⏸️ No clients in room {} — skip broadcasting", stockId);
+            return;
         }
+
+        // 방에 클라이언트가 1명 이상 있는 경우에만 전송
+        log.debug("✅ Broadcasting tradeTicks to {} clients in room {}", room.getClients().size(), stockId);
+        room.sendEvent("tickUpdate", TradeTickMessage.of(stockId, start, end, tradeTicks));
     }
+
+    // 특정 stockId 방에 TradeTick 정보 broadcast
+    public void sendTickToRoom(TradeTickMessage tradeTickMessage) {
+        String stockId = tradeTickMessage.stockId();
+        var room = server.getRoomOperations(stockId);
+
+        if (room.getClients().isEmpty()) {
+            log.debug("⏸️ No clients in room {} — skip broadcasting", tradeTickMessage.stockId());
+            return;
+        }
+
+        // 방에 클라이언트가 1명 이상 있는 경우에만 전송
+        log.debug("✅ Broadcasting tradeTicks to {} clients in room {}", room.getClients().size(), stockId);
+        room.sendEvent("tickUpdate", tradeTickMessage);
+    }
+
+
 }

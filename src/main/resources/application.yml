@@ -9,6 +9,10 @@ spring:
       database: xray-stock
       username: ${MONGO_USER}
       password: ${MONGO_PASS}
+    redis:
+      host: ${REDIS_URL:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASS}
 
 management:
   endpoints:
