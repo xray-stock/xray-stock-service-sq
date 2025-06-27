@@ -24,16 +24,19 @@ public class TradeTickSocketGateway {
 
     @PostConstruct
     public void init() {
+        // [사용자 연결 성공 처리]
         server.addConnectListener(client -> {
             log.info("[TradeTickSocketGateway.server.ConnectListener] client connected: sessionId = {}",
                     client.getSessionId());
         });
 
+        // [사용자 연결 종료 처리]
         server.addDisconnectListener(client -> {
             log.info("[TradeTickSocketGateway.server.DisconnectListener] client disconnected: sessionId = {}",
                     client.getSessionId());
         });
 
+        // [방입장 처리]
         server.addEventListener("joinRoom", String.class, (client, stockIdForJoiningRoom, ackSender) -> {
 
             // client: 누가 요청했는지에 대한 정보 (세션, 방 가입/탈퇴, 메시지 전송)
@@ -51,6 +54,19 @@ public class TradeTickSocketGateway {
             ackSender.sendAckData(AckMessage.ok());
             log.info("[TradeTickSocketGateway.server.EventListener] client joined room: sessionId = {}, stockIdForJoiningRoom = {}",
                     client.getSessionId(), stockIdForJoiningRoom);
+        });
+
+        // [방나가기 처리]
+        server.addEventListener("leaveRoom", String.class, (client, stockIdForLeavingRoom, ackSender) -> {
+            if (client.getAllRooms().contains(stockIdForLeavingRoom)) {
+                client.leaveRoom(stockIdForLeavingRoom);
+                log.info("[TradeTickSocketGateway.server.EventListener] client left room: sessionId = {}, stockId = {}",
+                        client.getSessionId(), stockIdForLeavingRoom);
+                ackSender.sendAckData(AckMessage.ok());
+            } else {
+                log.warn("Client attempted to leave a room they are not part of: {}", stockIdForLeavingRoom);
+                ackSender.sendAckData(AckMessage.fail("Not a member of the specified room: " + stockIdForLeavingRoom));
+            }
         });
     }
 
