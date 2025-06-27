@@ -1,6 +1,8 @@
 package app.xray.stock.stock_service.adapter.in.socket;
 
+import app.xray.stock.stock_service.adapter.in.socket.dto.AckMessage;
 import app.xray.stock.stock_service.adapter.in.socket.dto.TradeTickMessage;
+import app.xray.stock.stock_service.application.port.in.CheckEnableStockUseCase;
 import app.xray.stock.stock_service.domain.TradeTick;
 import com.corundumstudio.socketio.SocketIOServer;
 import jakarta.annotation.PostConstruct;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 @Log4j2
 @Component
@@ -17,6 +20,7 @@ import java.util.List;
 public class TradeTickSocketGateway {
 
     private final SocketIOServer server;
+    private final CheckEnableStockUseCase checkEnableStockUseCase;
 
     @PostConstruct
     public void init() {
@@ -30,10 +34,23 @@ public class TradeTickSocketGateway {
                     client.getSessionId());
         });
 
-        server.addEventListener("joinRoom", String.class, (client, roomName, ackSender) -> {
-            client.joinRoom(roomName);
-            log.info("[TradeTickSocketGateway.server.EventListener] client joined room: sessionId = {}, roomName = {}",
-                    client.getSessionId(), roomName);
+        server.addEventListener("joinRoom", String.class, (client, stockIdForJoiningRoom, ackSender) -> {
+
+            // client: 누가 요청했는지에 대한 정보 (세션, 방 가입/탈퇴, 메시지 전송)
+            // ackSender: 요청에 대해 응답을 줄 수 있는 핸들러 (ACK 응답 채널) -> Client 콜백 내 ACK 응답 활용
+
+            if (!checkEnableStockUseCase.check(stockIdForJoiningRoom, Instant.now())) {
+                log.warn("Client attempted to join invalid stockId: {}", stockIdForJoiningRoom);
+                ackSender.sendAckData(
+                        AckMessage.fail(String.format("error: invalid or disabled stockId [%s]",
+                                stockIdForJoiningRoom)));
+                return;
+            }
+
+            client.joinRoom(stockIdForJoiningRoom);
+            ackSender.sendAckData(AckMessage.ok());
+            log.info("[TradeTickSocketGateway.server.EventListener] client joined room: sessionId = {}, stockIdForJoiningRoom = {}",
+                    client.getSessionId(), stockIdForJoiningRoom);
         });
     }
 
